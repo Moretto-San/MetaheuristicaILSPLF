@@ -64,18 +64,17 @@ public class Solucao {
 		int iter = 0;
 		Random random = new Random();
 		while (iter < custoAberturaFacilidade.length / 2) {
-			int facilidade = random.nextInt(custoAberturaFacilidade.length);
-			System.err.println(facilidade);
+			int facilidade = random.nextInt(custoAberturaFacilidade.length);			
 			AddFacilidadesUsada(facilidade);
 			iter++;
 		}
 		for (int i = 0; i < this.clientesXFacilidade.length; i++) {
 			int linhaMenorCusto = 0;
 			int menorCusto = Integer.MAX_VALUE;
-			for (int linha = 0; linha < custoConexao.length; linha++) {
-				if (custoConexao[linha][i] < menorCusto) {
-					menorCusto = custoConexao[linha][i];
-					linhaMenorCusto = linha;
+			for (int facilidadesUsada : facilidadesUsadas) {
+				if (custoConexao[facilidadesUsada][i] < menorCusto) {
+					menorCusto = custoConexao[facilidadesUsada][i];
+					linhaMenorCusto = facilidadesUsada;
 				}
 			}
 			this.clientesXFacilidade[i] = linhaMenorCusto;
@@ -87,6 +86,14 @@ public class Solucao {
 				removeFacilidadesUsada(facilidade);
 			}
 		}
+	}
+
+	public Solucao buscaLocalRemoveFacilidade() {
+		Solucao solucao = new Solucao();
+		for (int facilidadeUsada : facilidadesUsadas) {
+
+		}
+		return solucao;
 	}
 
 }

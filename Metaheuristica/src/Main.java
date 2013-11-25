@@ -26,16 +26,11 @@ public class Main {
 				linha++;
 				leitura = instanciaArq.readLine();
 			}
-			for(int i=0; i<numFacilidades; i++){
-				for(int j=0; j<numCidades; j++){
-					System.err.print(custoConexao[i][j]+" ");
-				}
-				System.err.println();
-			}
 			Solucao corrente = new Solucao();
 			corrente.ConstruirSolucao(custoConexao, custoAberturaFacilidade);
-			System.err.println("Facilidades Usadas:"+corrente.getFacilidadesUsadas().size());
-			System.err.println("Custo total:"+corrente.getCustoTotal());
+			System.err.println("Facilidades Usadas:"
+					+ corrente.getFacilidadesUsadas().size());
+			System.err.println("Custo total:" + corrente.getCustoTotal());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
