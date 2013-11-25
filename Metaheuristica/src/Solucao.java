@@ -24,8 +24,9 @@ public class Solucao {
 		}
 	}
 
-	public void removeFacilidadesUsada(int facilidade) {
-		this.facilidadesUsadas.remove(facilidadesUsadas);
+	public void removeFacilidadesUsada(Integer facilidade) {
+		System.err.println("re");
+		this.facilidadesUsadas.remove(facilidade);
 	}
 
 	public void setFacilidadesUsadas(ArrayList<Integer> facilidadesUsadas) {
@@ -64,7 +65,7 @@ public class Solucao {
 		int iter = 0;
 		Random random = new Random();
 		while (iter < custoAberturaFacilidade.length / 2) {
-			int facilidade = random.nextInt(custoAberturaFacilidade.length);			
+			int facilidade = random.nextInt(custoAberturaFacilidade.length);
 			AddFacilidadesUsada(facilidade);
 			iter++;
 		}
@@ -81,10 +82,9 @@ public class Solucao {
 			this.custoClienteXFacilidade[i] = menorCusto;
 			this.custoTotal += menorCusto;
 		}
-		for (int facilidade : clientesXFacilidade) {
-			if (!this.facilidadesUsadas.contains(facilidadesUsadas)) {
-				removeFacilidadesUsada(facilidade);
-			}
+		removeFacilidadesNaoUsadas();
+		for (Integer facilidadesUsada : facilidadesUsadas) {
+			this.custoTotal += custoAberturaFacilidade[facilidadesUsada];
 		}
 	}
 
@@ -94,6 +94,24 @@ public class Solucao {
 
 		}
 		return solucao;
+	}
+
+	public void removeFacilidadesNaoUsadas() {
+		ArrayList<Integer> facilidadesRemover = new ArrayList<Integer>();
+		for (int facilidadesUsada : facilidadesUsadas) {
+			boolean achou = false;
+			for (int facilidade : clientesXFacilidade) {
+				if (facilidade == facilidadesUsada) {
+					achou = true;
+				}
+			}
+			if (!achou) {
+				facilidadesRemover.add(facilidadesUsada);				
+			}
+		}
+		for (Integer facilidade : facilidadesRemover) {
+			removeFacilidadesUsada(facilidade);
+		}
 	}
 
 }
