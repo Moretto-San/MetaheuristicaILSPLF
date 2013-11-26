@@ -14,11 +14,22 @@ public class Main {
 		leArqInstancia();
 		// TODO Auto-generated method stub
 		Random random = new Random();
-		random.setSeed(1);
+		//random.setSeed(2);
 		Solucao corrente = new Solucao();
 		corrente.ConstruirSolucao(custoConexao, custoAberturaFacilidade, random);
 		corrente = buscaLocalRemoveFacilidade(corrente, random, custoConexao);
+		int iter = 0;		
+		while(iter < 100){
+			Solucao temp = corrente.copiarSolucao();
+			perturbacao(temp, random);
+			temp = buscaLocalRemoveFacilidade(temp, random, custoConexao);
+			if(temp.getCustoTotal() < corrente.getCustoTotal()){
+				corrente = temp.copiarSolucao();
+			}
+			iter++;
+		}
 		imprimiSolucao(corrente);
+		corrente.verificaNullclientesXFacilidade();
 	}
 
 	public static void leArqInstancia() {
@@ -51,23 +62,23 @@ public class Main {
 	}
 
 	public static void imprimiSolucao(Solucao solucao) {
+		solucao.imprimiSolucao();
 		System.err.println("Instancia: " + nomeIntancia);
 		System.err.println("Numero de Facilidades: " + numFacilidades
 				+ " Numero de Cidades: " + numCidades);
 		System.err.println("Facilidades Usadas: "
 				+ solucao.getFacilidadesUsadas().size());
-		System.err.println("Custo total: " + solucao.getCustoTotal());
-		solucao.imprimiSolucao();
+		System.err.println("Custo total: " + solucao.getCustoTotal());		
 	}
 
-	private static Solucao buscaLocalRemoveFacilidade(Solucao corrente,
+	public static Solucao buscaLocalRemoveFacilidade(Solucao corrente,
 			Random random, Integer[][] custoConexao) {
-		Solucao temp = corrente;
+		Solucao temp = corrente.copiarSolucao();
 		boolean melhorou = true;
 		while (melhorou) {
 			ArrayList<String> facilidadesUsadas = corrente
 					.getFacilidadesUsadas();
-			int aleatorio = random.nextInt(facilidadesUsadas.size());
+			int aleatorio = random.nextInt(facilidadesUsadas.size()-1);
 			temp = corrente.copiarSolucao();
 			temp.removeFacilidadesUsada(facilidadesUsadas.get(aleatorio));
 			temp.setCidadesSemFacilidade(custoConexao, custoAberturaFacilidade);
@@ -79,4 +90,17 @@ public class Main {
 		}
 		return corrente;
 	}
+	
+	public static Solucao perturbacao(Solucao corrente, Random random){
+		Solucao temp = corrente.copiarSolucao();
+		ArrayList<String> facilidadesUsadas = corrente
+				.getFacilidadesUsadas();
+		int quantidade = (int) (facilidadesUsadas.size()*(0.3));
+		for(int i=0; i<quantidade; i++){
+			temp.removeFacilidadesUsada(facilidadesUsadas.get(i));
+		}
+		temp.reconstroiSolucao(quantidade, numFacilidades, random);
+		return temp;
+	}
+	
 }

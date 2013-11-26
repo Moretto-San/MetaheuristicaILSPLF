@@ -26,7 +26,7 @@ public class Solucao {
 	public void removeFacilidadesUsada(String facilidade) {
 		this.facilidadesUsadas.remove(facilidade);
 		for (int i = 0; i < clientesXFacilidade.length; i++) {
-			if (clientesXFacilidade[i].equals(facilidade)) {				
+			if (clientesXFacilidade[i] != null && clientesXFacilidade[i].equals(facilidade)) {
 				clientesXFacilidade[i] = null;
 			}
 		}
@@ -59,12 +59,12 @@ public class Solucao {
 		Integer iter = 0;
 		while (iter < custoAberturaFacilidade.length / 2) {
 			String facilidade = ""
-					+ random.nextInt(custoAberturaFacilidade.length);
+					+ random.nextInt(custoAberturaFacilidade.length-1);
 			AddFacilidadesUsada(facilidade);
 			iter++;
 		}
 		setCidadesSemFacilidade(custoConexao, custoAberturaFacilidade);
-		removeFacilidadesNaoUsadas(custoConexao, custoAberturaFacilidade);		
+		removeFacilidadesNaoUsadas(custoConexao, custoAberturaFacilidade);
 	}
 
 	public void setCidadesSemFacilidade(Integer[][] custoConexao,
@@ -77,14 +77,35 @@ public class Solucao {
 				for (String facilidadesUsada : facilidadesUsadas) {
 					if (custoConexao[Integer.parseInt(facilidadesUsada)][i] < menorCusto) {
 						menorCusto = custoConexao[Integer
-								.parseInt(facilidadesUsada)-1][i];
+								.parseInt(facilidadesUsada)][i];
 						linhaMenorCusto = Integer.parseInt(facilidadesUsada);
 					}
 				}
 				this.clientesXFacilidade[i] = "" + linhaMenorCusto;
 			}
 		}
-		this.custoTotal = calculaCustoTotal(custoAberturaFacilidade, custoConexao);
+		this.custoTotal = calculaCustoTotal(custoAberturaFacilidade,
+				custoConexao);
+	}
+
+	public void setCidadesXFacilidades(Integer[][] custoConexao,
+			Integer[] custoAberturaFacilidade) {
+
+		for (Integer i = 0; i < this.clientesXFacilidade.length; i++) {
+			Integer linhaMenorCusto = 0;
+			Integer menorCusto = Integer.MAX_VALUE;
+			for (String facilidadesUsada : facilidadesUsadas) {
+				if (custoConexao[Integer.parseInt(facilidadesUsada)][i] < menorCusto) {
+					menorCusto = custoConexao[Integer
+							.parseInt(facilidadesUsada)][i];
+					linhaMenorCusto = Integer.parseInt(facilidadesUsada);
+				}
+			}
+			this.clientesXFacilidade[i] = "" + linhaMenorCusto;
+
+		}
+		this.custoTotal = calculaCustoTotal(custoAberturaFacilidade,
+				custoConexao);
 	}
 
 	public void removeFacilidadesNaoUsadas(Integer[][] custoConexao,
@@ -109,11 +130,11 @@ public class Solucao {
 	public void imprimiSolucao() {
 		System.err.println("clientesXFacilidade");
 		for (int i = 0; i < clientesXFacilidade.length; i++) {
-			System.err.println(i+1 + " | " + clientesXFacilidade[i]);
+			System.err.println(i + 1 + " | " + (Integer.parseInt(clientesXFacilidade[i])+1));
 		}
 		System.err.println("facilidadesUsadas");
 		for (int i = 0; i < facilidadesUsadas.size(); i++) {
-			System.err.println(facilidadesUsadas.get(i));
+			System.err.println((Integer.parseInt(facilidadesUsadas.get(i))+1));
 		}
 	}
 
@@ -126,15 +147,40 @@ public class Solucao {
 				.clone());
 		return nova;
 	}
-	
-	public Integer calculaCustoTotal(Integer[] custoAberturaFacilidade, Integer[][] custoConexao){
+
+	public Integer calculaCustoTotal(Integer[] custoAberturaFacilidade,
+			Integer[][] custoConexao) {
 		Integer custoTotal = 0;
 		for (String facilidade : facilidadesUsadas) {
 			custoTotal += custoAberturaFacilidade[Integer.parseInt(facilidade)];
 		}
-		for(int i=0; i<clientesXFacilidade.length; i++){
+		for (int i = 0; i < clientesXFacilidade.length; i++) {
 			custoTotal += custoConexao[Integer.parseInt(clientesXFacilidade[i])][i];
 		}
 		return custoTotal;
 	}
+
+	public void reconstroiSolucao(int quantidade, Integer numFacilidades,
+			Random random) {
+		ArrayList<String> facilidadesNaoUsadas = new ArrayList<String>();
+		for (int i = 0; i < numFacilidades; i++) {
+			facilidadesNaoUsadas.add(i + "");
+		}
+		for (String facilidadeUsada : facilidadesUsadas) {
+			facilidadesNaoUsadas.remove(facilidadeUsada);
+		}
+		for (int i = 0; i < quantidade; i++) {
+			AddFacilidadesUsada(facilidadesNaoUsadas.get(random
+					.nextInt(facilidadesNaoUsadas.size() -1)));
+		}
+
+	}
+	public void verificaNullclientesXFacilidade(){
+		for (String facilidade : clientesXFacilidade) {
+			if(facilidade == null){
+				System.err.println("clientesXFacilidade possui null.");
+			}
+		}
+	}
+	
 }
