@@ -3,19 +3,18 @@ import java.util.Random;
 
 public class Solucao {
 
-	private int[] clientesXFacilidade;
-	private int custoTotal = Integer.MAX_VALUE;
-	private int[] custoClienteXFacilidade;
-	ArrayList<Integer> facilidadesUsadas = new ArrayList<Integer>();
+	private String[] clientesXFacilidade;
+	private Integer custoTotal = Integer.MAX_VALUE;
+	ArrayList<String> facilidadesUsadas = new ArrayList<String>();
 
-	public ArrayList<Integer> getFacilidadesUsadas() {
+	public ArrayList<String> getFacilidadesUsadas() {
 		return facilidadesUsadas;
 	}
 
-	public void AddFacilidadesUsada(int facilidadeNova) {
+	public void AddFacilidadesUsada(String facilidadeNova) {
 		boolean jaPossui = false;
-		for (Integer facilidade : this.facilidadesUsadas) {
-			if (facilidade == facilidadeNova) {
+		for (String facilidade : this.facilidadesUsadas) {
+			if (facilidade.equals(facilidadeNova)) {
 				jaPossui = false;
 			}
 		}
@@ -24,94 +23,118 @@ public class Solucao {
 		}
 	}
 
-	public void removeFacilidadesUsada(Integer facilidade) {
-		System.err.println("re");
+	public void removeFacilidadesUsada(String facilidade) {
 		this.facilidadesUsadas.remove(facilidade);
+		for (int i = 0; i < clientesXFacilidade.length; i++) {
+			if (clientesXFacilidade[i].equals(facilidade)) {				
+				clientesXFacilidade[i] = null;
+			}
+		}
 	}
 
-	public void setFacilidadesUsadas(ArrayList<Integer> facilidadesUsadas) {
+	public void setFacilidadesUsadas(ArrayList<String> facilidadesUsadas) {
 		this.facilidadesUsadas = facilidadesUsadas;
 	}
 
-	public int[] getClientesXFacilidade() {
+	public String[] getClientesXFacilidade() {
 		return clientesXFacilidade;
 	}
 
-	public void setClientesXFacilidade(int[] clientesXFacilidade) {
+	public void setClientesXFacilidade(String[] clientesXFacilidade) {
 		this.clientesXFacilidade = clientesXFacilidade;
 	}
 
-	public int getCustoTotal() {
+	public Integer getCustoTotal() {
 		return custoTotal;
 	}
 
-	public void setCustoTotal(int custoTotal) {
+	public void setCustoTotal(Integer custoTotal) {
 		this.custoTotal = custoTotal;
 	}
 
-	public int[] getCustoClienteXFacilidade() {
-		return custoClienteXFacilidade;
-	}
-
-	public void setCustoClienteXFacilidade(int[] custoClienteXFacilidade) {
-		this.custoClienteXFacilidade = custoClienteXFacilidade;
-	}
-
-	public void ConstruirSolucao(int[][] custoConexao,
-			int[] custoAberturaFacilidade) {
+	public void ConstruirSolucao(Integer[][] custoConexao,
+			Integer[] custoAberturaFacilidade, Random random) {
 		this.custoTotal = 0;
-		this.clientesXFacilidade = new int[custoConexao[0].length];
-		this.custoClienteXFacilidade = new int[custoConexao[0].length];
-		int iter = 0;
-		Random random = new Random();
+		this.clientesXFacilidade = new String[custoConexao[0].length];
+		Integer iter = 0;
 		while (iter < custoAberturaFacilidade.length / 2) {
-			int facilidade = random.nextInt(custoAberturaFacilidade.length);
+			String facilidade = ""
+					+ random.nextInt(custoAberturaFacilidade.length);
 			AddFacilidadesUsada(facilidade);
 			iter++;
 		}
-		for (int i = 0; i < this.clientesXFacilidade.length; i++) {
-			int linhaMenorCusto = 0;
-			int menorCusto = Integer.MAX_VALUE;
-			for (int facilidadesUsada : facilidadesUsadas) {
-				if (custoConexao[facilidadesUsada][i] < menorCusto) {
-					menorCusto = custoConexao[facilidadesUsada][i];
-					linhaMenorCusto = facilidadesUsada;
+		setCidadesSemFacilidade(custoConexao, custoAberturaFacilidade);
+		removeFacilidadesNaoUsadas(custoConexao, custoAberturaFacilidade);		
+	}
+
+	public void setCidadesSemFacilidade(Integer[][] custoConexao,
+			Integer[] custoAberturaFacilidade) {
+
+		for (Integer i = 0; i < this.clientesXFacilidade.length; i++) {
+			if (clientesXFacilidade[i] == null) {
+				Integer linhaMenorCusto = 0;
+				Integer menorCusto = Integer.MAX_VALUE;
+				for (String facilidadesUsada : facilidadesUsadas) {
+					if (custoConexao[Integer.parseInt(facilidadesUsada)][i] < menorCusto) {
+						menorCusto = custoConexao[Integer
+								.parseInt(facilidadesUsada)-1][i];
+						linhaMenorCusto = Integer.parseInt(facilidadesUsada);
+					}
 				}
+				this.clientesXFacilidade[i] = "" + linhaMenorCusto;
 			}
-			this.clientesXFacilidade[i] = linhaMenorCusto;
-			this.custoClienteXFacilidade[i] = menorCusto;
-			this.custoTotal += menorCusto;
 		}
-		removeFacilidadesNaoUsadas();
-		for (Integer facilidadesUsada : facilidadesUsadas) {
-			this.custoTotal += custoAberturaFacilidade[facilidadesUsada];
-		}
+		this.custoTotal = calculaCustoTotal(custoAberturaFacilidade, custoConexao);
 	}
 
-	public Solucao buscaLocalRemoveFacilidade() {
-		Solucao solucao = new Solucao();
-		for (int facilidadeUsada : facilidadesUsadas) {
-
-		}
-		return solucao;
-	}
-
-	public void removeFacilidadesNaoUsadas() {
-		ArrayList<Integer> facilidadesRemover = new ArrayList<Integer>();
-		for (int facilidadesUsada : facilidadesUsadas) {
+	public void removeFacilidadesNaoUsadas(Integer[][] custoConexao,
+			Integer[] custoAberturaFacilidade) {
+		ArrayList<String> facilidadesRemover = new ArrayList<String>();
+		for (String facilidadesUsada : facilidadesUsadas) {
 			boolean achou = false;
-			for (int facilidade : clientesXFacilidade) {
-				if (facilidade == facilidadesUsada) {
+			for (String facilidade : clientesXFacilidade) {
+				if (facilidade.equals(facilidadesUsada)) {
 					achou = true;
 				}
 			}
 			if (!achou) {
-				facilidadesRemover.add(facilidadesUsada);				
+				facilidadesRemover.add(facilidadesUsada);
 			}
 		}
-		for (Integer facilidade : facilidadesRemover) {
+		for (String facilidade : facilidadesRemover) {
 			removeFacilidadesUsada(facilidade);
 		}
 	}
 
+	public void imprimiSolucao() {
+		System.err.println("clientesXFacilidade");
+		for (int i = 0; i < clientesXFacilidade.length; i++) {
+			System.err.println(i+1 + " | " + clientesXFacilidade[i]);
+		}
+		System.err.println("facilidadesUsadas");
+		for (int i = 0; i < facilidadesUsadas.size(); i++) {
+			System.err.println(facilidadesUsadas.get(i));
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public Solucao copiarSolucao() {
+		Solucao nova = new Solucao();
+		nova.setClientesXFacilidade(this.clientesXFacilidade.clone());
+		nova.setCustoTotal(this.custoTotal);
+		nova.setFacilidadesUsadas((ArrayList<String>) this.facilidadesUsadas
+				.clone());
+		return nova;
+	}
+	
+	public Integer calculaCustoTotal(Integer[] custoAberturaFacilidade, Integer[][] custoConexao){
+		Integer custoTotal = 0;
+		for (String facilidade : facilidadesUsadas) {
+			custoTotal += custoAberturaFacilidade[Integer.parseInt(facilidade)];
+		}
+		for(int i=0; i<clientesXFacilidade.length; i++){
+			custoTotal += custoConexao[Integer.parseInt(clientesXFacilidade[i])][i];
+		}
+		return custoTotal;
+	}
 }
