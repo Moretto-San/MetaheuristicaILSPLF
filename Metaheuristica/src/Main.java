@@ -11,19 +11,42 @@ public class Main {
 	public static Integer[] custoAberturaFacilidade;
 
 	public static void main(String[] args) {
-		leArqInstancia();
+		for(int i=1;i<10;i++){
+			String nomeArq = "Instancias/B/B1."+i;
+			ils(nomeArq);	
+		}
+		for(int i=1;i<10;i++){
+			String nomeArq = "Instancias/C/C1."+i;
+			ils(nomeArq);	
+		}
+		for(int i=1;i<11;i++){
+			for(int j=1;j<11;j++){
+				String nomeArq = "Instancias/Dq/"+i+"/D"+i+"."+j;
+				ils(nomeArq);
+			}				
+		}
+		for(int i=1;i<11;i++){
+			for(int j=1;j<11;j++){
+				String nomeArq = "Instancias/Eq/"+i+"/E"+i+"."+j;
+				ils(nomeArq);
+			}				
+		}
+	}
+
+	public static void ils(String nomeArq) {
+		leArqInstancia(nomeArq);
 		// TODO Auto-generated method stub
 		Random random = new Random();
-		//random.setSeed(2);
+		random.setSeed(2);
 		Solucao corrente = new Solucao();
 		corrente.ConstruirSolucao(custoConexao, custoAberturaFacilidade, random);
 		corrente = buscaLocalRemoveFacilidade(corrente, random, custoConexao);
-		int iter = 0;		
-		while(iter < 100){
+		int iter = 0;
+		while (iter < 100) {
 			Solucao temp = corrente.copiarSolucao();
 			perturbacao(temp, random);
 			temp = buscaLocalRemoveFacilidade(temp, random, custoConexao);
-			if(temp.getCustoTotal() < corrente.getCustoTotal()){
+			if (temp.getCustoTotal() < corrente.getCustoTotal()) {
 				corrente = temp.copiarSolucao();
 			}
 			iter++;
@@ -32,10 +55,10 @@ public class Main {
 		corrente.verificaNullclientesXFacilidade();
 	}
 
-	public static void leArqInstancia() {
+	public static void leArqInstancia(String nomeArq) {
 		try {
 			RandomAccessFile instanciaArq = new RandomAccessFile(new File(
-					"InstanciaB1"), "r");
+					nomeArq), "r");
 			String leitura = instanciaArq.readLine();
 			nomeIntancia = leitura.split(" ")[1];
 			leitura = instanciaArq.readLine();
@@ -62,13 +85,13 @@ public class Main {
 	}
 
 	public static void imprimiSolucao(Solucao solucao) {
-		solucao.imprimiSolucao();
+		// solucao.imprimiSolucao();
 		System.err.println("Instancia: " + nomeIntancia);
 		System.err.println("Numero de Facilidades: " + numFacilidades
 				+ " Numero de Cidades: " + numCidades);
 		System.err.println("Facilidades Usadas: "
 				+ solucao.getFacilidadesUsadas().size());
-		System.err.println("Custo total: " + solucao.getCustoTotal());		
+		System.err.println("Custo total: " + solucao.getCustoTotal());
 	}
 
 	public static Solucao buscaLocalRemoveFacilidade(Solucao corrente,
@@ -78,29 +101,28 @@ public class Main {
 		while (melhorou) {
 			ArrayList<String> facilidadesUsadas = corrente
 					.getFacilidadesUsadas();
-			int aleatorio = random.nextInt(facilidadesUsadas.size()-1);
+			int aleatorio = random.nextInt(facilidadesUsadas.size() - 1);
 			temp = corrente.copiarSolucao();
 			temp.removeFacilidadesUsada(facilidadesUsadas.get(aleatorio));
 			temp.setCidadesSemFacilidade(custoConexao, custoAberturaFacilidade);
 			if (temp.getCustoTotal() < corrente.getCustoTotal()) {
 				corrente = temp.copiarSolucao();
-			}else{
+			} else {
 				melhorou = false;
 			}
 		}
 		return corrente;
 	}
-	
-	public static Solucao perturbacao(Solucao corrente, Random random){
+
+	public static Solucao perturbacao(Solucao corrente, Random random) {
 		Solucao temp = corrente.copiarSolucao();
-		ArrayList<String> facilidadesUsadas = corrente
-				.getFacilidadesUsadas();
-		int quantidade = (int) (facilidadesUsadas.size()*(0.3));
-		for(int i=0; i<quantidade; i++){
+		ArrayList<String> facilidadesUsadas = corrente.getFacilidadesUsadas();
+		int quantidade = (int) (facilidadesUsadas.size() * (0.3));
+		for (int i = 0; i < quantidade; i++) {
 			temp.removeFacilidadesUsada(facilidadesUsadas.get(i));
 		}
 		temp.reconstroiSolucao(quantidade, numFacilidades, random);
 		return temp;
 	}
-	
+
 }
